@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wedding Vendor Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #FBF8F3;
+  --ivory: #F5F0E8;
+  --warm-white: #FFFDF9;
+  --dusty-rose: #C4938E;
+  --rose-light: #E8CCC8;
+  --rose-muted: #D4ACA7;
+  --sage: #8BA888;
+  --sage-light: #C5D9C0;
+  --sage-muted: #A3C39E;
+  --gold: #C6A96C;
+  --gold-light: #E8D9B0;
+  --gold-deep: #B8944A;
+  --charcoal: #3A3632;
+  --warm-gray: #7D756D;
+  --light-gray: #D5CFC7;
+  --text-primary: #2E2A26;
+  --text-secondary: #6B635A;
+  --shadow-soft: 0 2px 16px rgba(58,54,50,0.06);
+  --shadow-card: 0 4px 24px rgba(58,54,50,0.08);
+  --shadow-hover: 0 8px 40px rgba(58,54,50,0.12);
+  --radius: 8px;
+  --radius-lg: 14px;
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Jost', sans-serif;
+  background: var(--cream);
+  color: var(--text-primary);
+  line-height: 1.6;
+  font-weight: 400;
+  min-height: 100vh;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C6A96C' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app { position: relative; z-index: 1; }
+
+.header {
+  text-align: center;
+  padding: 56px 24px 40px;
+  background: linear-gradient(180deg, var(--warm-white) 0%, var(--cream) 100%);
+  border-bottom: 1px solid var(--light-gray);
+  position: relative;
+}
+.header::after {
+  content: '\2726';
+  display: block;
+  font-size: 14px;
+  color: var(--gold);
+  letter-spacing: 12px;
+  margin-top: 20px;
+  opacity: 0.7;
+}
+.header h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  color: var(--charcoal);
+  letter-spacing: 0.03em;
+}
+.header p {
+  font-size: 0.92rem;
+  color: var(--warm-gray);
+  margin-top: 6px;
+  font-weight: 300;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.dashboard {
+  display: flex;
+  gap: 16px;
+  max-width: 1200px;
+  margin: -20px auto 0;
+  padding: 0 24px;
+  position: relative;
+  z-index: 2;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.stat-card {
+  background: var(--warm-white);
+  border: 1px solid var(--light-gray);
+  border-radius: var(--radius-lg);
+  padding: 20px 28px;
+  min-width: 160px;
+  flex: 1;
+  max-width: 220px;
+  box-shadow: var(--shadow-soft);
+  text-align: center;
+  transition: var(--transition);
+}
+.stat-card:hover { box-shadow: var(--shadow-card); transform: translateY(-2px); }
+.stat-number {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--charcoal);
+  line-height: 1.1;
+}
+.stat-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--warm-gray);
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.toolbar {
+  max-width: 1200px;
+  margin: 32px auto 0;
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+.tab {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 100px;
+  padding: 8px 18px;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--warm-gray);
+  cursor: pointer;
+  transition: var(--transition);
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.tab:hover { color: var(--text-primary); background: var(--ivory); }
+.tab.active {
+  color: var(--text-primary);
+  background: var(--warm-white);
+  border-color: var(--light-gray);
+  box-shadow: var(--shadow-soft);
+  font-weight: 500;
+}
+.tab-badge {
+  background: var(--light-gray);
+  color: var(--warm-gray);
+  font-size: 0.7rem;
+  padding: 1px 7px;
+  border-radius: 100px;
+  font-weight: 500;
+}
+.tab.active .tab-badge { background: var(--gold-light); color: var(--gold-deep); }
+
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn {
+  background: var(--warm-white);
+  border: 1px solid var(--light-gray);
+  border-radius: 100px;
+  padding: 8px 20px;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition);
+  letter-spacing: 0.02em;
+}
+.btn:hover { border-color: var(--gold); color: var(--text-primary); box-shadow: var(--shadow-soft); }
+.btn-compare {
+  background: var(--dusty-rose);
+  color: #fff;
+  border-color: var(--dusty-rose);
+  display: none;
+}
+.btn-compare.visible { display: inline-flex; }
+.btn-compare:hover { background: var(--rose-muted); border-color: var(--rose-muted); }
+
+.grid {
+  max-width: 1200px;
+  margin: 24px auto 60px;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: var(--warm-white);
+  border: 1px solid var(--light-gray);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+  transition: var(--transition);
+  position: relative;
+  animation: fadeUp 0.5s ease both;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.card:hover { box-shadow: var(--shadow-hover); transform: translateY(-3px); }
+.card.booked { border-color: var(--gold); border-width: 2px; }
+.card.booked::before {
+  content: '\2713 Booked';
+  position: absolute;
+  top: 14px; right: 14px;
+  background: var(--gold);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 100px;
+  z-index: 2;
+}
+.card.passed { opacity: 0.5; filter: grayscale(0.3); }
+.card.passed:hover { opacity: 0.75; }
+
+.card-top {
+  padding: 24px 24px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+.card-checkbox {
+  appearance: none;
+  width: 18px; height: 18px;
+  border: 1.5px solid var(--light-gray);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: var(--transition);
+  flex-shrink: 0;
+  margin-top: 4px;
+  position: relative;
+}
+.card-checkbox:checked {
+  background: var(--dusty-rose);
+  border-color: var(--dusty-rose);
+}
+.card-checkbox:checked::after {
+  content: '\2713';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.vendor-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.45rem;
+  font-weight: 600;
+  color: var(--charcoal);
+  line-height: 1.2;
+  flex: 1;
+}
+.category-badge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 100px;
+  flex-shrink: 0;
+}
+.badge-photo { background: var(--rose-light); color: #8A5C57; }
+.badge-video { background: var(--sage-light); color: #4F6F4B; }
+.badge-cake  { background: var(--gold-light); color: #8A6F2C; }
+
+.card-email { padding: 6px 24px 0; font-size: 0.82rem; color: var(--warm-gray); }
+.card-email a { color: var(--warm-gray); text-decoration: none; }
+.card-email a:hover { color: var(--dusty-rose); }
+
+.card-status { padding: 14px 24px 0; }
+.status-select {
+  appearance: none;
+  background: var(--ivory) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237D756D' stroke-width='1.5' fill='none'/%3E%3C/svg%3E") no-repeat right 12px center;
+  border: 1px solid var(--light-gray);
+  border-radius: 100px;
+  padding: 6px 32px 6px 14px;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition);
+  font-weight: 400;
+}
+.status-select:hover { border-color: var(--gold); }
+.status-select:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(198,169,108,0.15); }
+
+.packages { padding: 16px 24px 0; }
+.packages-title {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--warm-gray);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+.package-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 10px 0;
+  border-top: 1px solid rgba(213,207,199,0.5);
+  gap: 12px;
+}
+.package-row:first-of-type { border-top: none; }
+.package-name { font-weight: 500; font-size: 0.88rem; color: var(--text-primary); }
+.package-price {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--gold-deep);
+  white-space: nowrap;
+}
+.package-details { font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px; line-height: 1.5; }
+
+.card-notes { padding: 14px 24px; }
+.vendor-notes { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; font-style: italic; margin-bottom: 8px; }
+.notes-textarea {
+  width: 100%;
+  min-height: 54px;
+  border: 1px solid var(--light-gray);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.82rem;
+  color: var(--text-primary);
+  background: var(--ivory);
+  resize: vertical;
+  transition: var(--transition);
+}
+.notes-textarea::placeholder { color: var(--light-gray); }
+.notes-textarea:focus { outline: none; border-color: var(--gold); background: var(--warm-white); box-shadow: 0 0 0 3px rgba(198,169,108,0.1); }
+
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(46,42,38,0.55);
+  backdrop-filter: blur(6px);
+  z-index: 100;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  animation: fadeIn 0.25s ease;
+}
+.modal-overlay.open { display: flex; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.modal {
+  background: var(--warm-white);
+  border-radius: var(--radius-lg);
+  max-width: 960px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  animation: slideUp 0.35s ease;
+}
+@keyframes slideUp { from { transform: translateY(24px); opacity: 0; } }
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 28px;
+  border-bottom: 1px solid var(--light-gray);
+  position: sticky;
+  top: 0;
+  background: var(--warm-white);
+  z-index: 2;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+.modal-header h2 { font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: 1.5rem; }
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--warm-gray);
+  transition: var(--transition);
+  width: 36px; height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+.modal-close:hover { background: var(--ivory); color: var(--text-primary); }
+.comparison-grid { display: grid; gap: 0; padding: 0; }
+.comparison-col { padding: 24px 28px; border-right: 1px solid var(--light-gray); }
+.comparison-col:last-child { border-right: none; }
+.comparison-col h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 600; margin-bottom: 4px; }
+.comparison-col .cat-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 14px; display: inline-block; }
+.comparison-package { padding: 10px 0; border-top: 1px solid rgba(213,207,199,0.4); }
+.comparison-package:first-of-type { border-top: none; }
+
+.empty-state { text-align: center; padding: 60px 24px; grid-column: 1 / -1; }
+.empty-state p { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; color: var(--warm-gray); font-style: italic; }
+
+.notice-bar { max-width: 1200px; margin: 24px auto 0; padding: 0 24px; }
+.notice {
+  background: linear-gradient(135deg, var(--gold-light) 0%, #f0e4c7 100%);
+  border: 1px solid var(--gold);
+  border-radius: var(--radius);
+  padding: 14px 20px;
+  font-size: 0.84rem;
+  color: #6B5A2E;
+  line-height: 1.5;
+}
+.notice strong { font-weight: 600; }
+.notice code { background: rgba(255,255,255,0.5); padding: 1px 5px; border-radius: 3px; font-size: 0.8rem; }
+
+@media print {
+  body { background: #fff; }
+  body::before { display: none; }
+  .toolbar, .dashboard, .card-checkbox, .notes-textarea, .modal-overlay, .btn, .notice-bar { display: none !important; }
+  .card { break-inside: avoid; box-shadow: none; border: 1px solid #ddd; }
+  .grid { display: block; }
+  .grid .card { margin-bottom: 16px; }
+  .header { padding: 24px; }
+  .card.passed { opacity: 1; filter: none; }
+}
+
+@media (max-width: 768px) {
+  .grid { grid-template-columns: 1fr; }
+  .toolbar { flex-direction: column; align-items: stretch; }
+  .tabs { justify-content: center; }
+  .actions { justify-content: center; }
+  .dashboard { gap: 8px; }
+  .stat-card { padding: 14px 16px; min-width: 100px; }
+  .stat-number { font-size: 1.5rem; }
+  .comparison-grid { grid-template-columns: 1fr !important; }
+  .comparison-col { border-right: none; border-bottom: 1px solid var(--light-gray); }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<header class="header">
+  <h1>Wedding Vendor Tracker</h1>
+  <p>Compare &amp; Organize Your Dream Team</p>
+</header>
+
+<div class="dashboard" id="dashboard"></div>
+
+<div class="notice-bar" id="noticeBar">
+  <div class="notice">
+    <strong>&#8505;&#65039; Placeholder Data:</strong> The vendor data below is sample data for demonstration. To populate with your real vendor emails, update the <code>vendors</code> array at the top of the <code>&lt;script&gt;</code> section in this file.
+    <br><button onclick="this.closest('.notice-bar').style.display='none'" style="margin-top:8px;background:none;border:1px solid #B8944A;border-radius:100px;padding:4px 14px;font-family:inherit;font-size:0.78rem;color:#6B5A2E;cursor:pointer;">Dismiss</button>
+  </div>
+</div>
+
+<div class="toolbar">
+  <div class="tabs" id="tabs"></div>
+  <div class="actions">
+    <button class="btn btn-compare" id="btnCompare" onclick="openComparison()">Compare Selected</button>
+    <button class="btn" onclick="exportCSV()">&#8595; CSV</button>
+    <button class="btn" onclick="window.print()">&#8595; PDF</button>
+  </div>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<div class="modal-overlay" id="compModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Side-by-Side Comparison</h2>
+      <button class="modal-close" onclick="closeComparison()">&#215;</button>
+    </div>
+    <div class="comparison-grid" id="compGrid"></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+var vendors = [
+  {
+    id: "v1", category: "photo", name: "Abigail Malone Photography",
+    email: "hello@abigailmalone.com",
+    packages: [
+      { name: "Essentials", price: "$3,800", details: "6 hours, 1 photographer, online gallery, 400+ edited photos" },
+      { name: "Classic", price: "$5,200", details: "8 hours, 2 photographers, engagement session, online gallery, 600+ edited photos" },
+      { name: "Luxe Collection", price: "$7,500", details: "10 hours, 2 photographers, engagement session, bridal portraits, heirloom album, 800+ edited photos" }
+    ],
+    notes: "Fine-art style, natural light specialist. 4-6 week turnaround. Based in Philly, no travel fee within 50 mi."
+  },
+  {
+    id: "v2", category: "photo", name: "Peach & Pine Studio",
+    email: "bookings@peachandpine.com",
+    packages: [
+      { name: "Elopement", price: "$2,400", details: "3 hours, 1 photographer, 200+ edited photos, online gallery" },
+      { name: "Full Day", price: "$4,600", details: "8 hours, 2 photographers, online gallery, 500+ edited photos, sneak peek within 48 hrs" },
+      { name: "Premium", price: "$6,800", details: "10 hours, 2 photographers, engagement shoot, rehearsal dinner coverage, album credit, 700+ images" }
+    ],
+    notes: "Editorial & documentary blend. Very responsive over email. Weekday discount available. Travels East Coast."
+  },
+  {
+    id: "v3", category: "photo", name: "Lena Kara Photography",
+    email: "lena@lenakara.co",
+    packages: [
+      { name: "Intimate", price: "$3,200", details: "5 hours, 1 photographer, online gallery, 350+ edited photos" },
+      { name: "Signature", price: "$5,500", details: "8 hours, 2 photographers, engagement session, 550+ edited photos, print credit" }
+    ],
+    notes: "Moody, romantic tones. Books only 20 weddings/year. PDF pricing guide attached to original email."
+  },
+  {
+    id: "v4", category: "video", name: "Reel & Bloom Films",
+    email: "info@reelandbloom.com",
+    packages: [
+      { name: "Highlight Film", price: "$3,000", details: "6 hours, 1 videographer, 3-5 min highlight film, drone footage" },
+      { name: "Cinematic", price: "$5,200", details: "8 hours, 2 videographers, highlight film + full ceremony edit, drone, audio capture" },
+      { name: "Feature Film", price: "$7,800", details: "10 hours, 2 videographers, 20-30 min feature film, highlight reel, raw footage, drone" }
+    ],
+    notes: "Cinematic style, color graded. 12-16 week delivery. $500 travel fee outside tri-state area."
+  },
+  {
+    id: "v5", category: "video", name: "Golden Hour Cinema",
+    email: "hello@goldenhrcinema.com",
+    packages: [
+      { name: "Essential", price: "$2,800", details: "6 hours, 1 videographer, 4 min highlight, ceremony edit" },
+      { name: "Premiere", price: "$4,500", details: "8 hours, 2 videographers, highlight + ceremony + reception edit, drone" }
+    ],
+    notes: "Warm, nostalgic film look. Very popular - books out 10 months. Mention referral for 10% off."
+  },
+  {
+    id: "v6", category: "video", name: "Atlas Wedding Films",
+    email: "weddings@atlasweddingfilms.com",
+    packages: [
+      { name: "Documentary", price: "$3,500", details: "8 hours, 1 videographer, full documentary edit (15-20 min), highlight reel" },
+      { name: "Cinematic Duo", price: "$5,800", details: "10 hours, 2 videographers, feature film, highlight reel, drone, raw footage USB" }
+    ],
+    notes: "Storytelling-focused, interview-style films. Quick 8-week turnaround. Free planning call."
+  },
+  {
+    id: "v7", category: "cake", name: "Buttercream & Bloom",
+    email: "orders@buttercreambloom.com",
+    packages: [
+      { name: "Petite (50 servings)", price: "$650", details: "2-tier fondant or buttercream, custom design consultation, delivery & setup" },
+      { name: "Classic (100 servings)", price: "$1,200", details: "3-tier, custom flavors, sugar flowers or fresh florals, delivery & setup" },
+      { name: "Grand (200 servings)", price: "$2,400", details: "4-5 tier, custom design, sugar flowers, topper, dessert table styling, delivery & setup" }
+    ],
+    notes: "Organic ingredients available (+15%). Tastings available Saturdays, $50 credited to order. 3 month minimum lead time."
+  },
+  {
+    id: "v8", category: "cake", name: "The Flour Studio",
+    email: "info@theflourstudio.com",
+    packages: [
+      { name: "Simple Elegance (75 servings)", price: "$800", details: "2-tier buttercream, 2 flavors, basic floral accents, delivery" },
+      { name: "Artisan (150 servings)", price: "$1,800", details: "3-4 tier, custom flavors, hand-painted details or sugar work, delivery & setup" }
+    ],
+    notes: "Known for painted/watercolor cakes. $75 tasting fee (non-refundable). Minimum $600 order for wedding cakes."
+  },
+  {
+    id: "v9", category: "cake", name: "Sweet Fern Bakery",
+    email: "hello@sweetfernbakery.com",
+    packages: [
+      { name: "Cutting Cake + Dessert Bar", price: "$1,100", details: "Small 2-tier display cake + cupcakes/macarons for 100 guests" },
+      { name: "Statement Cake (120 servings)", price: "$1,500", details: "3-tier, 3 flavor options, custom fondant design, sugar flowers, delivery & setup" },
+      { name: "Luxury Collection (200+)", price: "$2,800", details: "5-tier showpiece, custom flavors, edible gold leaf, sugar sculptures, on-site assembly" }
+    ],
+    notes: "Allergy-friendly options (GF, vegan). Won Best of Philly 2025. Books fast for fall dates."
+  }
+];
+
+var activeTab = 'all';
+var selected = new Set();
+
+var categoryLabels = {
+  photo: { emoji: '\ud83d\udcf7', label: 'Photography', badgeClass: 'badge-photo' },
+  video: { emoji: '\ud83c\udfac', label: 'Videography', badgeClass: 'badge-video' },
+  cake:  { emoji: '\ud83c\udf82', label: 'Cake & Bakeries', badgeClass: 'badge-cake' }
+};
+
+function getStatus(id) { return localStorage.getItem('wvt_status_' + id) || 'Researching'; }
+function setStatus(id, val) { localStorage.setItem('wvt_status_' + id, val); }
+function getNotes(id) { return localStorage.getItem('wvt_notes_' + id) || ''; }
+function setNotes(id, val) { localStorage.setItem('wvt_notes_' + id, val); }
+
+function parsePriceNumber(p) {
+  var n = parseFloat(p.replace(/[^0-9.]/g, ''));
+  return isNaN(n) ? null : n;
+}
+
+function renderDashboard() {
+  var counts = { photo: 0, video: 0, cake: 0, booked: 0 };
+  var prices = [];
+  vendors.forEach(function(v) {
+    counts[v.category]++;
+    if (getStatus(v.id) === 'Booked') counts.booked++;
+    v.packages.forEach(function(p) { var n = parsePriceNumber(p.price); if (n) prices.push(n); });
+  });
+  var lo = prices.length ? '$' + Math.min.apply(null, prices).toLocaleString() : '\u2014';
+  var hi = prices.length ? '$' + Math.max.apply(null, prices).toLocaleString() : '\u2014';
+  document.getElementById('dashboard').innerHTML =
+    '<div class="stat-card"><div class="stat-number">' + vendors.length + '</div><div class="stat-label">Total Vendors</div></div>' +
+    '<div class="stat-card"><div class="stat-number">' + counts.photo + '</div><div class="stat-label">Photographers</div></div>' +
+    '<div class="stat-card"><div class="stat-number">' + counts.video + '</div><div class="stat-label">Videographers</div></div>' +
+    '<div class="stat-card"><div class="stat-number">' + counts.cake + '</div><div class="stat-label">Bakeries</div></div>' +
+    '<div class="stat-card"><div class="stat-number">' + counts.booked + '</div><div class="stat-label">Booked</div></div>' +
+    '<div class="stat-card"><div class="stat-number" style="font-size:1.2rem">' + lo + ' \u2013 ' + hi + '</div><div class="stat-label">Price Range</div></div>';
+}
+
+function renderTabs() {
+  var cats = ['all', 'photo', 'video', 'cake'];
+  var labels = { all: 'All Vendors', photo: '\ud83d\udcf7 Photography', video: '\ud83c\udfac Videography', cake: '\ud83c\udf82 Cake & Bakeries' };
+  var counts = { all: vendors.length };
+  vendors.forEach(function(v) { counts[v.category] = (counts[v.category] || 0) + 1; });
+  document.getElementById('tabs').innerHTML = cats.map(function(c) {
+    return '<button class="tab' + (activeTab === c ? ' active' : '') + '" onclick="switchTab(\'' + c + '\')">' + labels[c] + ' <span class="tab-badge">' + (counts[c] || 0) + '</span></button>';
+  }).join('');
+}
+
+function switchTab(cat) { activeTab = cat; renderTabs(); renderGrid(); }
+
+function renderGrid() {
+  var filtered = activeTab === 'all' ? vendors : vendors.filter(function(v) { return v.category === activeTab; });
+  if (!filtered.length) {
+    document.getElementById('grid').innerHTML = '<div class="empty-state"><p>No vendors in this category yet.</p></div>';
+    return;
+  }
+  document.getElementById('grid').innerHTML = filtered.map(function(v, i) {
+    var status = getStatus(v.id);
+    var notes = getNotes(v.id);
+    var cat = categoryLabels[v.category];
+    var cardClass = status === 'Booked' ? 'booked' : status === 'Passed' ? 'passed' : '';
+    var checked = selected.has(v.id) ? 'checked' : '';
+    var statuses = ['Researching','Contacted','Meeting Scheduled','Quoted','Booked','Passed'];
+    var optionsHtml = statuses.map(function(s) { return '<option' + (s === status ? ' selected' : '') + '>' + s + '</option>'; }).join('');
+    var pkgHtml = v.packages.map(function(p) {
+      return '<div class="package-row"><div><div class="package-name">' + p.name + '</div><div class="package-details">' + p.details + '</div></div><div class="package-price">' + p.price + '</div></div>';
+    }).join('');
+    var vendorNotesHtml = v.notes ? '<div class="card-notes"><div class="vendor-notes">"' + v.notes + '"</div></div>' : '';
+    return '<div class="card ' + cardClass + '" style="animation-delay:' + (i * 0.06) + 's" data-id="' + v.id + '">'
+      + '<div class="card-top">'
+      + '<input type="checkbox" class="card-checkbox" ' + checked + ' onchange="toggleSelect(\'' + v.id + '\', this.checked)" title="Select for comparison">'
+      + '<div class="vendor-name">' + v.name + '</div>'
+      + '<span class="category-badge ' + cat.badgeClass + '">' + cat.emoji + ' ' + cat.label + '</span>'
+      + '</div>'
+      + '<div class="card-email"><a href="mailto:' + v.email + '">' + v.email + '</a></div>'
+      + '<div class="card-status"><select class="status-select" onchange="changeStatus(\'' + v.id + '\', this.value)">' + optionsHtml + '</select></div>'
+      + '<div class="packages"><div class="packages-title">Packages</div>' + pkgHtml + '</div>'
+      + vendorNotesHtml
+      + '<div class="card-notes"><textarea class="notes-textarea" placeholder="Add your personal notes\u2026" oninput="setNotes(\'' + v.id + '\', this.value)">' + notes + '</textarea></div>'
+      + '</div>';
+  }).join('');
+}
+
+function changeStatus(id, val) { setStatus(id, val); renderDashboard(); renderGrid(); }
+
+function toggleSelect(id, on) {
+  if (on) selected.add(id); else selected.delete(id);
+  document.getElementById('btnCompare').className = 'btn btn-compare' + (selected.size >= 2 ? ' visible' : '');
+}
+
+function openComparison() {
+  if (selected.size < 2) return;
+  var items = vendors.filter(function(v) { return selected.has(v.id); });
+  var grid = document.getElementById('compGrid');
+  grid.style.gridTemplateColumns = 'repeat(' + items.length + ', 1fr)';
+  grid.innerHTML = items.map(function(v) {
+    var cat = categoryLabels[v.category];
+    var pkgs = v.packages.map(function(p) {
+      return '<div class="comparison-package"><div style="display:flex;justify-content:space-between;gap:8px"><span class="package-name">' + p.name + '</span><span class="package-price">' + p.price + '</span></div><div class="package-details">' + p.details + '</div></div>';
+    }).join('');
+    var notesHtml = v.notes ? '<div style="margin-top:12px;font-size:0.8rem;font-style:italic;color:var(--text-secondary)">' + v.notes + '</div>' : '';
+    return '<div class="comparison-col"><h3>' + v.name + '</h3><span class="cat-label" style="color:var(--warm-gray)">' + cat.emoji + ' ' + cat.label + '</span><div style="font-size:0.8rem;color:var(--warm-gray);margin-bottom:12px">' + v.email + '</div>' + pkgs + notesHtml + '</div>';
+  }).join('');
+  document.getElementById('compModal').classList.add('open');
+}
+
+function closeComparison() { document.getElementById('compModal').classList.remove('open'); }
+document.getElementById('compModal').addEventListener('click', function(e) { if (e.target === e.currentTarget) closeComparison(); });
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeComparison(); });
+
+function exportCSV() {
+  var headers = ['Name','Category','Email','Status','Packages','Notes (from vendor)','Personal Notes'];
+  var rows = vendors.map(function(v) {
+    return [v.name, categoryLabels[v.category].label, v.email, getStatus(v.id),
+      v.packages.map(function(p) { return p.name + ': ' + p.price + ' (' + p.details + ')'; }).join(' | '),
+      v.notes || '', getNotes(v.id)];
+  });
+  var all = [headers].concat(rows);
+  var csv = all.map(function(r) { return r.map(function(c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(','); }).join('\n');
+  var blob = new Blob([csv], { type: 'text/csv' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'wedding_vendors.csv';
+  a.click();
+}
+
+renderDashboard();
+renderTabs();
+renderGrid();
+</script>
+</body>
+</html>
